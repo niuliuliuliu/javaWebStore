@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:属性:用于指定当前映射文件和那个接口进行映射，需要指定接口文件路径，需要标注包的完整路径-->
+<mapper namespace="com.cy.store.mapper.UserMapper">
+    <!--自定义映射规则：resultMap标签来完成映射规则的定义-->
+    <!--
+        id属性：用于表示给映射规则分配一个唯一的id值，对应的就是resultMap="id属性的值”属性的取值
+        type属性：查询结果于java哪一个类进行映射，取值为一个类
+    -->
+    <resultMap id="UserEntityMap" type="com.cy.store.entity.User">
+        <!--将表的资源和类的属性不一致的字段进行匹配指定，名称一致的字段可以省略
+            但是主键不能省略
+        -->
+        <!--
+            column表示表中的资源名称
+            property表示类中的属性名称
+        -->
+        <id column="uid" property="uid"></id>
+        <result column="is_delete" property="isDelete"></result>
+        <result column="created_time" property="createdTime"></result>
+        <result column="modified_user" property="modifiedUser"></result>
+        <result column="modified_time" property="modifiedTime"></result>
+    </resultMap>
+    <!--id属性：表示映射的接口中方法的名称，直接在标签的内容编写sql语句 -->
+    <!--values是动态值，需要给占位符进行占位-->
+    <!--
+        useGeneratedKeys属性：开启某个字段的值递增（主键设置为递增）
+        keyProperty属性：标签将表中的哪个字段作为主键进行递增
+    -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="uid">
+        INSERT INTO t_user(
+            username, password, salt,phone, email, gender, avatar,
+            is_delete, created_time, modified_user,modified_time
+        ) VALUES(
+            #{username},#{password},#{salt},#{phone},#{email},#{gender},#{avatar},
+           #{isDelete},#{createdTime},#{modifiedUser},#{modifiedTime}
+        )
+
+    </insert>
+
+    <!--
+    select语句查询对象时，1、有可能有一个结果.2、有可能有多个结果
+    -->
+    <!--
+    方法一：resultType：表示查询的结果集类型，只需要指定对应映射类的类型，并且包含完整接口
+    resultType=“com.cy.store.entity.User"
+    但是映射类类型即成员变量必须和表的属性的字段完全一致，所以在此处无法使用
+    -->
+    <!--
+    方法二：resultMap：当表的属性和类的变量字段不一致时，可自定义结果集的映射规则
+    -->
+    <select id="findByUsername" resultMap="UserEntityMap">
+        SELECT * FROM t_user WHERE username = #{username}
+    </select>
+</mapper>
